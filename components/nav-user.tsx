@@ -1,110 +1,79 @@
 "use client"
 
-import {
-  IconCreditCard,
-  IconDotsVertical,
-  IconLogout,
-  IconNotification,
-  IconUserCircle,
-} from "@tabler/icons-react"
-
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+import * as React from "react"
+import { SidebarMenu } from "@/components/ui/sidebar"
+import { AuthDialog, type AuthMode } from "./auth/auth-dialog"
+import { UserDropdown } from "./auth/user-dropdown"
 
 export function NavUser({
   user,
+  isLoggedIn = true,
+  onLoginStatusChange,
 }: {
   user: {
     name: string
     email: string
     avatar: string
   }
+  isLoggedIn?: boolean
+  onLoginStatusChange?: (status: boolean) => void
 }) {
-  const { isMobile } = useSidebar()
+  const [authOpen, setAuthOpen] = React.useState(false)
+  const [authMode, setAuthMode] = React.useState<AuthMode>("login")
+
+  // Reset to default mode when dialog/drawer is closed
+  React.useEffect(() => {
+    if (!authOpen) {
+      setAuthMode(isLoggedIn ? "logout" : "login")
+    }
+  }, [authOpen, isLoggedIn])
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (onLoginStatusChange) onLoginStatusChange(true)
+    setAuthOpen(false)
+  }
+
+  const handleSignup = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (onLoginStatusChange) onLoginStatusChange(true)
+    setAuthOpen(false)
+  }
+
+  const handleResetPassword = (e: React.FormEvent) => {
+    e.preventDefault()
+    alert("Password reset link sent to your email!")
+    setAuthMode("login")
+  }
+
+  const handleLogout = () => {
+    if (onLoginStatusChange) onLoginStatusChange(false)
+    setAuthOpen(false)
+  }
+
+  // When opening the dialog/drawer, set the appropriate mode
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      setAuthMode("logout")
+    }
+    setAuthOpen(newOpen)
+  }
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
-                </span>
-              </div>
-              <IconDotsVertical className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
+      <UserDropdown user={user} onLogoutClick={() => setAuthOpen(true)} />
+
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={handleOpenChange}
+        authMode={authMode}
+        onAuthModeChange={setAuthMode}
+        onLogin={handleLogin}
+        onSignup={handleSignup}
+        onResetPassword={handleResetPassword}
+        onLogout={handleLogout}
+      />
     </SidebarMenu>
   )
 }
+

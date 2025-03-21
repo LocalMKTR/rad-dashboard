@@ -21,6 +21,7 @@ export function NavUser({
   isLoggedIn?: boolean
   onLoginStatusChange?: (status: boolean) => void
 }) {
+  console.log("this is the user on nav-user: ",user)
   const router = useRouter()
   const [authOpen, setAuthOpen] = React.useState(false)
   const [authMode, setAuthMode] = React.useState<AuthMode>("login")

@@ -24,6 +24,7 @@ interface UserDropdownProps {
 }
 
 export function UserDropdown({ user: initialUser, onLogoutClick }: UserDropdownProps) {
+  console.log("this is the initial user: ",initialUser)
   const { isMobile } = useSidebar()
   const [user, setUser] = useState(
     initialUser || {

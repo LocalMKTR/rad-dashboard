@@ -1,30 +1,21 @@
 "use client"
-
-import type * as React from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { LoginForm, LogoutConfirmation, ResetPasswordForm, SignupForm } from "./auth-forms"
-
-export type AuthMode = "login" | "signup" | "reset" | "logout"
+import type { AuthMode } from "./types"
+import { LoginForm } from "./login-form"
+import { SignupForm } from "./signup-form"
+import { ResetPasswordForm } from "./reset-password-form"
+import { LogoutConfirmation } from "./logout-confirmation"
 
 interface AuthDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   authMode: AuthMode
   onAuthModeChange: (mode: AuthMode) => void
-  onLogin: (e: React.FormEvent) => void
-  onSignup: (e: React.FormEvent) => void
-  onResetPassword: (e: React.FormEvent) => void
+  onLoginSuccess: () => void
+  onSignupSuccess: () => void
   onLogout: () => void
 }
 
@@ -33,36 +24,23 @@ export function AuthDialog({
   onOpenChange,
   authMode,
   onAuthModeChange,
-  onLogin,
-  onSignup,
-  onResetPassword,
+  onLoginSuccess,
+  onSignupSuccess,
   onLogout,
 }: AuthDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
-  // Get title and description based on current mode
-  const getDialogContent = () => {
+  // Get title based on auth mode
+  const getTitle = () => {
     switch (authMode) {
       case "login":
-        return {
-          title: "Log in",
-          description: "Enter your credentials to log in to your account.",
-        }
+        return "Sign in"
       case "signup":
-        return {
-          title: "Sign up",
-          description: "Create a new account to get started.",
-        }
+        return "Sign up"
       case "reset":
-        return {
-          title: "Reset password",
-          description: "Enter your email to receive a password reset link.",
-        }
+        return "Reset Password"
       case "logout":
-        return {
-          title: "Log out",
-          description: "Confirm that you want to log out of your account.",
-        }
+        return "Log out"
     }
   }
 
@@ -70,25 +48,22 @@ export function AuthDialog({
   const getFormContent = () => {
     switch (authMode) {
       case "login":
-        return <LoginForm onLogin={onLogin} onModeChange={onAuthModeChange} />
+        return <LoginForm onModeChange={onAuthModeChange} onSuccess={onLoginSuccess} />
       case "signup":
-        return <SignupForm onSignup={onSignup} onModeChange={onAuthModeChange} />
+        return <SignupForm onModeChange={onAuthModeChange} onSuccess={onSignupSuccess} />
       case "reset":
-        return <ResetPasswordForm onResetPassword={onResetPassword} onModeChange={onAuthModeChange} />
+        return <ResetPasswordForm onModeChange={onAuthModeChange} />
       case "logout":
         return <LogoutConfirmation onCancel={() => onOpenChange(false)} onLogout={onLogout} />
     }
   }
 
-  const dialogContent = getDialogContent()
-
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{dialogContent.title}</DialogTitle>
-            <DialogDescription>{dialogContent.description}</DialogDescription>
+          <DialogHeader className="p-0">
+            <DialogTitle className="sr-only">{getTitle()}</DialogTitle>
           </DialogHeader>
           {getFormContent()}
         </DialogContent>
@@ -100,11 +75,10 @@ export function AuthDialog({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>{dialogContent.title}</DrawerTitle>
-          <DrawerDescription>{dialogContent.description}</DrawerDescription>
+          <DrawerTitle className="sr-only">{getTitle()}</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-6">{getFormContent()}</div>
-        {authMode !== "logout" && (
+        <div className={`px-4 ${authMode === "logout" ? "pb-10" : "pb-6"}`}>{getFormContent()}</div>
+        {authMode !== "logout" && authMode !== "reset" && (
           <DrawerFooter className="pt-2">
             <DrawerClose asChild>
               <Button variant="outline">Cancel</Button>

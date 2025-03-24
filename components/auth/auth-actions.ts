@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/supabase/server"
 import { hasEnvVars } from "@/supabase/check-env-vars"
+import { redirect } from "next/navigation"
 
 export type Message = {
   type: "success" | "error"
@@ -176,13 +177,11 @@ export async function signUpAction(formData: FormData): Promise<Message> {
   }
 }
 
-// Add a logout action
-export async function logoutAction(): Promise<void> {
-  // Always use Supabase for logout, even in fallback mode
-  // This avoids the cookies() API issues
+
+export const signOutAction = async () => {
   const supabase = await createClient()
   await supabase.auth.signOut()
-
   revalidatePath("/")
+  return redirect("/")
 }
 

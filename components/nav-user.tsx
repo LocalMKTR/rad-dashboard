@@ -6,7 +6,7 @@ import { SidebarMenu } from "@/components/ui/sidebar"
 import { AuthDialog } from "./auth/auth-dialog"
 import { UserDropdown } from "./auth/user-dropdown"
 import type { AuthMode } from "./auth/types"
-import { createClient } from "@/supabase/client"
+
 
 export function NavUser({
   user,
@@ -21,46 +21,46 @@ export function NavUser({
   isLoggedIn?: boolean
   onLoginStatusChange?: (status: boolean) => void
 }) {
-  console.log("this is the user on nav-user: ",user)
+  //console.log("this is the user on nav-user: ",user)
   const router = useRouter()
   const [authOpen, setAuthOpen] = React.useState(false)
   const [authMode, setAuthMode] = React.useState<AuthMode>("login")
-  const [currentUser, setCurrentUser] = React.useState(user)
+  const [currentUser] = React.useState(user)
 
   // Fetch user data if not provided
-  React.useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) {
-        try {
-          const supabase = createClient()
-          const {
-            data: { user: supabaseUser },
-          } = await supabase.auth.getUser()
+  // React.useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     if (!user) {
+  //       try {
+  //         const supabase = createClient()
+  //         const {
+  //           data: { user: supabaseUser },
+  //         } = await supabase.auth.getUser()
 
-          if (supabaseUser) {
-            // Get user profile data if available
-            const { data: profile } = await supabase.from("profiles").select("*").eq("id", supabaseUser.id).single()
+  //         if (supabaseUser) {
+  //           // Get user profile data if available
+  //           const { data: profile } = await supabase.from("profiles").select("*").eq("id", supabaseUser.id).single()
 
-            setCurrentUser({
-              name:
-                profile?.display_name ||
-                profile?.full_name ||
-                supabaseUser.user_metadata?.full_name ||
-                supabaseUser.email?.split("@")[0] ||
-                "User",
-              email: supabaseUser.email || "No email",
-              avatar:
-                profile?.avatar_url || supabaseUser.user_metadata?.avatar_url || "/placeholder.svg?height=32&width=32",
-            })
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error)
-        }
-      }
-    }
+  //           setCurrentUser({
+  //             name:
+  //               profile?.display_name ||
+  //               profile?.full_name ||
+  //               supabaseUser.user_metadata?.full_name ||
+  //               supabaseUser.email?.split("@")[0] ||
+  //               "User",
+  //             email: supabaseUser.email || "No email",
+  //             avatar:
+  //               profile?.avatar_url || supabaseUser.user_metadata?.avatar_url || "/placeholder.svg?height=32&width=32",
+  //           })
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching user data:", error)
+  //       }
+  //     }
+  //   }
 
-    fetchUserData()
-  }, [user])
+  //   fetchUserData()
+  // }, [user])
 
   // Reset to default mode when dialog/drawer is closed
   React.useEffect(() => {

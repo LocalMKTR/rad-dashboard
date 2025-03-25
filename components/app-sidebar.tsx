@@ -63,7 +63,7 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: "Projects",
+      title: "Builds",
       url: "#",
       icon: IconFolder,
     },

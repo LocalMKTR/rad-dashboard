@@ -8,7 +8,8 @@ import {
 
 import { getUserBasicData } from "@/components/auth/user-info"
 import { fetchBuilderById } from "../../builder/[builder]/builderactions"
-import { BuilderProfileCard } from "./builder-profile-card"
+import { BuilderProfileCard } from "@/components/builder/builder-profile-card"
+
 interface BuildDetailPageProps {
   params: { builder: string }
   searchParams: { tab?: string; comment?: string }

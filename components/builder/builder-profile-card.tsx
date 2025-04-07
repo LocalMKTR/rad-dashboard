@@ -34,7 +34,7 @@ export async function BuilderProfileCard({ builder }: BuilderProfileCardProps) {
 
   // Pre-render the tab contents as server components
   const aboutTab = <AboutTab description={builder.description} skills={builderSkills} />
-  const buildsTab = <BuildsTab isCurrentUser={isCurrentUser} />
+  const buildsTab = <BuildsTab isCurrentUser={isCurrentUser} builderId={builder.id} />
   const contactTab = <ContactTab email={builder.email} location={builder.location} />
 
   return (

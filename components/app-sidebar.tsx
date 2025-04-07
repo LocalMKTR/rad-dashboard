@@ -159,21 +159,27 @@ const data = {
 
 export function AppSidebar({ userData, ...props }: AppSidebarProps) {
   // Default user data if none is provided
-  const defaultUser = {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  }
+  // const defaultUser = {
+  //   name: "shadcn",
+  //   email: "m@example.com",
+  //   avatar: "/avatars/shadcn.jpg",
+  // }
 
   // Create user object for NavUser component
   const user = userData
     ? {
-        name: userData.name || "User",
+      id: userData.id || "default-id",  
+      name: userData.name || "User",
         email: userData.email || "No email",
         avatar: userData.avatar || "/placeholder.svg?height=32&width=32",
       }
-    : defaultUser
-
+    : {
+      id: "default-id",  // Ensure there's always an id for the default user
+      name: "shadcn",
+      email: "m@example.com",
+      avatar: "/avatars/shadcn.jpg",
+    }
+    // console.log("this is the user on app-sidebar: ",userData)
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>

@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
@@ -27,6 +27,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BuildTracker 5.0",
   description: "Track and share your builds with the community",
+}
+
+export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: META_THEME_COLORS.light },
     { media: "(prefers-color-scheme: dark)", color: META_THEME_COLORS.dark },
@@ -66,7 +69,7 @@ export default async function RootLayout({
       userId = user.id
       // Fix: Convert undefined to null using nullish coalescing
       userEmail = user.email ?? null
-      console.log("Authenticated user:", userId)
+      // console.log("Authenticated user:", userId)
     } else {
       console.log("No authenticated user")
     }
@@ -94,4 +97,3 @@ export default async function RootLayout({
     </html>
   )
 }
-

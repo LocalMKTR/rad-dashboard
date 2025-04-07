@@ -15,8 +15,8 @@ import { getUserBasicData } from "@/components/auth/user-info"
 export default async function Page() {
 
   const { id: userId, email: userEmail, name: userName, isAuthenticated } = await getUserBasicData()
-  console.log("This is the getUserBasicData", getUserBasicData)
-  console.log("This is the Authinfo", isAuthenticated)
+  //console.log("This is the getUserBasicData", getUserBasicData)
+  //console.log("This is the Authinfo", isAuthenticated)
   return (
     <SidebarProvider
       style={

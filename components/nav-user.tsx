@@ -14,6 +14,7 @@ export function NavUser({
   onLoginStatusChange,
 }: {
   user?: {
+    id: string
     name?: string
     email?: string
     avatar?: string
@@ -26,6 +27,7 @@ export function NavUser({
   const [authOpen, setAuthOpen] = React.useState(false)
   const [authMode, setAuthMode] = React.useState<AuthMode>("login")
   const [currentUser] = React.useState(user)
+  // console.log("this is the current user: nav-user",currentUser)
 
   // Fetch user data if not provided
   // React.useEffect(() => {

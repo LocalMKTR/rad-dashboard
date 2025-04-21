@@ -212,7 +212,7 @@ export default async function BuildDetailPage({ params, searchParams }: BuildDet
                           <div className="space-y-4">
                             <p className="text-muted-foreground">Share progress updates about your build here.</p>
                             <Button asChild>
-                              <Link href={`/build/${buildId}/update/new`}>Add Update</Link>
+                              <Link href={`/update/new?buildId=${buildId}`}>Add Update</Link>
                             </Button>
                           </div>
                         ) : (

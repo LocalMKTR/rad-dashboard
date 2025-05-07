@@ -81,7 +81,7 @@ export default async function NewUpdatePage({ searchParams }: NewUpdatePageProps
     }
 
     const newUpdateId = data[0].id
-    redirect(`/build/${buildId}/update/${newUpdateId}`)
+    redirect(`/update/${newUpdateId}`)
   }
 
   return (

@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface UpdatePageProps {
-  params: { build: string; update: string }
+  params: { update: string }
   searchParams: { tab?: string }
 }
 
@@ -24,7 +24,6 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
   const resolvedParams = await Promise.resolve(params)
   const resolvedSearchParams = await Promise.resolve(searchParams)
 
-  const buildId = resolvedParams.build
   const updateId = resolvedParams.update
   const activeTab = resolvedSearchParams?.tab || "details"
 
@@ -33,29 +32,21 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
   // Fetch the update
   const { data: update, error: updateError } = await supabase
     .from("build_updates")
-    .select("*")
+    .select("*, builds(name, id, user_id)")
     .eq("id", updateId)
-    .eq("build_id", buildId)
     .single()
 
   if (updateError || !update) {
     notFound()
   }
 
-  // Fetch the build to get build name and check ownership
-  const { data: build, error: buildError } = await supabase
-    .from("builds")
-    .select("name, user_id")
-    .eq("id", buildId)
-    .single()
-
-  if (buildError || !build) {
-    notFound()
-  }
+  // Extract build information from the joined query
+  const buildId = update.builds?.id
+  const buildName = update.builds?.name || "Build"
 
   // Get current user to check if they're the owner
   const { id: userId, email: userEmail, name: userName, isAuthenticated } = await getUserBasicData()
-  const isOwner = userId === build.user_id
+  const isOwner = userId === update.builds?.user_id
 
   // Fetch update steps
   const { data: steps } = await supabase
@@ -116,9 +107,11 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="container mx-auto p-1">
                 <div className="mb-2">
-                  <Link href={`/build/${buildId}`} className="text-sm text-muted-foreground hover:underline">
-                    &larr; Back to {build.name}
-                  </Link>
+                  {buildId && (
+                    <Link href={`/build/${buildId}`} className="text-sm text-muted-foreground hover:underline">
+                      &larr; Back to {buildName}
+                    </Link>
+                  )}
                 </div>
 
                 <div className="mb-6 flex items-center justify-between">
@@ -133,9 +126,9 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                       </span>
                     </div>
                   </div>
-                  {isOwner && (
+                  {isOwner && buildId && (
                     <Button asChild variant="outline">
-                      <Link href={`/build/${buildId}/update/${updateId}/edit`}>
+                      <Link href={`/update/${updateId}/edit`}>
                         <PenLine className="w-4 h-4 mr-2" />
                         Edit Update
                       </Link>
@@ -146,13 +139,13 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                 <Tabs defaultValue={activeTab} className="w-full">
                   <TabsList className="mb-6">
                     <TabsTrigger value="details" asChild>
-                      <Link href={`/build/${buildId}/update/${updateId}?tab=details`}>Details</Link>
+                      <Link href={`/update/${updateId}?tab=details`}>Details</Link>
                     </TabsTrigger>
                     <TabsTrigger value="steps" asChild>
-                      <Link href={`/build/${buildId}/update/${updateId}?tab=steps`}>Steps</Link>
+                      <Link href={`/update/${updateId}?tab=steps`}>Steps</Link>
                     </TabsTrigger>
                     <TabsTrigger value="comments" asChild>
-                      <Link href={`/build/${buildId}/update/${updateId}?tab=comments`}>Comments</Link>
+                      <Link href={`/update/${updateId}?tab=comments`}>Comments</Link>
                     </TabsTrigger>
                   </TabsList>
 
@@ -191,7 +184,7 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                         <CardTitle>Steps</CardTitle>
                         {isOwner && (
                           <Button asChild size="sm">
-                            <Link href={`/build/${buildId}/update/${updateId}/steps/new`}>Add Step</Link>
+                            <Link href={`/update/${updateId}/steps/new`}>Add Step</Link>
                           </Button>
                         )}
                       </CardHeader>
@@ -212,9 +205,7 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                                   {isOwner && (
                                     <div className="flex gap-2 mt-2">
                                       <Button variant="outline" size="sm" asChild>
-                                        <Link href={`/build/${buildId}/update/${updateId}/steps/${step.id}/edit`}>
-                                          Edit
-                                        </Link>
+                                        <Link href={`/update/${updateId}/steps/${step.id}/edit`}>Edit</Link>
                                       </Button>
                                       <Button variant="destructive" size="sm">
                                         Delete
@@ -240,7 +231,7 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                             <p className="text-muted-foreground">No steps have been added yet.</p>
                             {isOwner && (
                               <Button asChild className="mt-4">
-                                <Link href={`/build/${buildId}/update/${updateId}/steps/new`}>Add First Step</Link>
+                                <Link href={`/update/${updateId}/steps/new`}>Add First Step</Link>
                               </Button>
                             )}
                           </div>
@@ -281,7 +272,7 @@ export default async function UpdatePage({ params, searchParams }: UpdatePagePro
                             {comments.map((comment) => (
                               <div key={comment.id} className="flex gap-4">
                                 <Avatar>
-                                  <AvatarImage src={comment.profiles?.avatar_url} />
+                                  <AvatarImage src={comment.profiles?.avatar_url || "/placeholder.svg"} />
                                   <AvatarFallback>{comment.profiles?.name?.charAt(0) || "U"}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1 space-y-1">
